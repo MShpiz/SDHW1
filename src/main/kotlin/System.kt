@@ -148,9 +148,11 @@ class System {
             return list
         }
 
-        private fun saveData() {
-            fileManager.writeToFile(MOVIE_FILE, MovieStorageJSONSerializer().serialize(movieStorage))
-            fileManager.writeToFile(SESSION_FILE, SessionStorageJSONSerializer().serialize(sessionStorage))
+        private fun saveData(): Boolean{
+
+            var result = fileManager.writeToFile(MOVIE_FILE, MovieStorageJSONSerializer().serialize(movieStorage))
+            result = result && fileManager.writeToFile(SESSION_FILE, SessionStorageJSONSerializer().serialize(sessionStorage))
+            return result
         }
 
         private fun loadData() {

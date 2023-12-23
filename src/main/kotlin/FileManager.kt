@@ -7,7 +7,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class FileManager {
-    fun writeToFile(path: String, text: String){
+    fun writeToFile(path: String, text: String): Boolean{
         val file = File(path)
 
         file.createNewFile()
@@ -15,8 +15,9 @@ class FileManager {
         try {
             PrintWriter(file, Charsets.UTF_8).use { it.print(text)}
         } catch (e : IOException) {
-            throw IOException("Unable to write to file")
+            return false
         }
+        return true
     }
 
     fun readFromFile(path: String): String {

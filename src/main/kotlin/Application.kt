@@ -1,4 +1,3 @@
-
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -35,7 +34,7 @@ class Application {
 
             try {
                 ans = readln().toInt()
-            } catch (e: NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println("Incorrect command")
                 continue
             }
@@ -56,11 +55,11 @@ class Application {
 
     private fun showSessionInfo() {
         println("Upcoming sessions:")
-        Printer.printSessions(System.getFutureSessions())
+        Printer.printSessions(System.getFutureSessions(), true)
 
         println()
         println("Passed sessions:")
-        Printer.printSessions(System.getPassedSessions())
+        Printer.printSessions(System.getPassedSessions(), true)
         println()
         println("Enter anything to exit")
         readln()
@@ -90,7 +89,7 @@ class Application {
 
             try {
                 ans = readln().toInt()
-            } catch (e: NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println("Incorrect command")
                 continue
             }
@@ -111,48 +110,48 @@ class Application {
     private fun askYNQuestion(prompt: String): Boolean {
         print("$prompt (y/n)")
         val ans = readln()
-        return  ans.lowercase() == "y" || ans.lowercase() == "yes"
+        return ans.lowercase() == "y" || ans.lowercase() == "yes"
     }
 
     private fun sellTicket() {
         println("Chose session")
         val sessions: List<Session> = System.getFutureSessions()
-        if (sessions.isEmpty()){
+        if (sessions.isEmpty()) {
             println("There are no upcoming sessions")
             return
         }
         Printer.printSessions(sessions)
         val sessionNumber: Int
-        try{
+        try {
             sessionNumber = readln().toInt()
         } catch (e: NumberFormatException) {
             println("This session is not on the list")
             return
         }
 
-        if (!checkAnswer(sessionNumber, sessions.lastIndex + 1)){
+        if (!checkAnswer(sessionNumber, sessions.lastIndex + 1)) {
             println("This session is not on the list")
             return
         }
 
-        if (sessions[sessionNumber-1].isFull()) {
+        if (sessions[sessionNumber - 1].isFull()) {
             println("Session is full")
             return
         }
 
         println("Choose place")
-        Printer.printPlaces(sessions[sessionNumber-1].placesStatus)
+        Printer.printPlaces(sessions[sessionNumber - 1].placesStatus)
         var place: Int = -1
         var isFree = false
         while (!isFree) {
             println("Enter number of place you want to take")
-            try{
+            try {
                 place = readln().toInt()
             } catch (e: NumberFormatException) {
                 place = -1
             }
 
-            isFree = sessions[sessionNumber-1].placeIsFree(place - 1)
+            isFree = sessions[sessionNumber - 1].placeIsFree(place - 1)
             if (!isFree) {
                 if (!askYNQuestion("this place is already taken\nDo you want to continue?")) {
                     return
@@ -160,7 +159,7 @@ class Application {
             }
         }
 
-        println("Price for this seat is ${sessions[sessionNumber-1].cost}$")
+        println("Price for this seat is ${sessions[sessionNumber - 1].cost}$")
 
         if (!askYNQuestion("Do you want to proceed?")) {
             println("Failed to sell ticket")
@@ -173,7 +172,7 @@ class Application {
             var isCard = true
             try {
                 cardNumber = readln().toInt()
-            } catch (e: NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println("not a number")
                 isCard = false
             }
@@ -186,7 +185,7 @@ class Application {
                 }
             }
         }
-        val ticket: Ticket = System.sellTicket(sessions[sessionNumber-1].id, place - 1)
+        val ticket: Ticket = System.sellTicket(sessions[sessionNumber - 1].id, place - 1)
         println("Ticket sold:")
         Printer.printTicket(ticket)
         return
@@ -200,6 +199,10 @@ class Application {
 
     private fun addSession() {
         Printer.printMovies(System.getMovies())
+        if (System.getMovies().isEmpty()) {
+            println("add movies to collection first")
+            return
+        }
         println("Session for which movie you are going to make (enter its number)? (to exit enter any other number)")
         val result: Int
         try {
@@ -208,7 +211,7 @@ class Application {
             println("exiting to menu")
             return
         }
-        if (!checkAnswer(result, System.getMovies().lastIndex + 1)){
+        if (!checkAnswer(result, System.getMovies().lastIndex + 1)) {
             println("exiting to menu")
             return
         }
@@ -220,7 +223,7 @@ class Application {
         println("Enter date and starting time of session (format: HH:mm dd.MM.yyyy)")
 
         val sessionTime: LocalDateTime
-        try{
+        try {
             sessionTime = LocalDateTime.parse(readln(), DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy"))
         } catch (e: DateTimeParseException) {
             println("could not recognize date")
@@ -229,7 +232,7 @@ class Application {
 
         println("Enter cost of a ticket: ")
         val cost: Int
-        try{
+        try {
             cost = readln().toInt()
         } catch (e: NumberFormatException) {
             println("not a number")
@@ -256,7 +259,7 @@ class Application {
 
             try {
                 ans = readln().toInt()
-            } catch (e: NumberFormatException){
+            } catch (e: NumberFormatException) {
                 println("Incorrect command")
                 continue
             }
@@ -281,7 +284,7 @@ class Application {
             println("exiting to menu")
             return
         }
-        if (!checkAnswer(result, System.getMovies().lastIndex + 1)){
+        if (!checkAnswer(result, System.getMovies().lastIndex + 1)) {
             println("exiting to menu")
             return
         }
@@ -300,10 +303,10 @@ class Application {
 
     private fun addMovie() {
         println("Enter movie name")
-        var name: String = String()
+        var name = String()
         while (name.isBlank()) {
             name = readln()
-            if (name.isBlank()){
+            if (name.isBlank()) {
                 println("Enter not a blank name")
             }
         }
@@ -311,8 +314,8 @@ class Application {
         println("Enter movie duration in minutes")
         var isCorrect = false
         var duration = 0
-        while(!isCorrect) {
-            try{
+        while (!isCorrect) {
+            try {
                 duration = readln().toInt()
             } catch (e: NumberFormatException) {
                 isCorrect = false
@@ -334,7 +337,7 @@ class Application {
 
     private fun removeSession() {
         Printer.printSessions(System.getPassedSessions())
-        if (System.getPassedSessions().isEmpty())  return
+        if (System.getPassedSessions().isEmpty()) return
 
         println("Which session do you want to remove (enter its number)? (to exit enter any other number)")
 
@@ -345,7 +348,7 @@ class Application {
             println("exiting to menu")
             return
         }
-        if (!checkAnswer(result, System.getMovies().lastIndex + 1) ){
+        if (!checkAnswer(result, System.getMovies().lastIndex + 1)) {
             println("exiting to menu")
             return
         }

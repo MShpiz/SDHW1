@@ -2,7 +2,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class SessionStorageJSONSerializer: ISerializer<SessionStorage> {
+class SessionStorageJSONSerializer : ISerializer<SessionStorage> {
     override fun serialize(unit: SessionStorage): String {
         return Json.encodeToString(unit)
     }
@@ -10,14 +10,14 @@ class SessionStorageJSONSerializer: ISerializer<SessionStorage> {
     override fun deserialize(string: String): SessionStorage? {
         val result: SessionStorage? = try {
             Json.decodeFromString<SessionStorage>(string)
-        } catch (e: SerializationException){
+        } catch (e: SerializationException) {
             // println(e.message)
             null
         } catch (e: IllegalArgumentException) {
             // println(e.message)
             null
         } catch (e: Exception) {
-            println(e.message)
+            // println(e.message)
             null
         }
         return result

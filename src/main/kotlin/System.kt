@@ -23,7 +23,7 @@ class System {
             return prefix + sdf.format(Date()).toString()
         }
 
-        fun addMovie(name: String, duration: Int):Boolean{
+        fun addMovie(name: String, duration: Int): Boolean {
             val hasName: (Movie) -> Boolean = { it.name == name }
             if (movieStorage.items.any(hasName)) {
                 return false
@@ -35,9 +35,12 @@ class System {
             return true
         }
 
-        fun addSession(movieId: String, sessionTime: LocalDateTime, cost: Int): Boolean{
-            val idx = movieStorage.items.indexOfFirst {it.id == movieId}
+        fun addSession(movieId: String, sessionTime: LocalDateTime, cost: Int): Boolean {
+            val idx = movieStorage.items.indexOfFirst { it.id == movieId }
             if (idx == -1) {
+                return false
+            }
+            if (sessionTime < LocalDateTime.now()) {
                 return false
             }
             val movieDuration = movieStorage.items[idx].duration
@@ -71,8 +74,8 @@ class System {
             return true
         }
 
-        fun sellTicket(sessionID: String, place: Int): Ticket{
-            val idx = sessionStorage.items.indexOfFirst {it.id == sessionID}
+        fun sellTicket(sessionID: String, place: Int): Ticket {
+            val idx = sessionStorage.items.indexOfFirst { it.id == sessionID }
             sessionStorage.items[idx].markPlaceAs(place, SeatStatus.SOLD)
             sessionStorage.items[idx].tickets.add(Ticket(makeID("tkt"), place))
             saveData()
@@ -83,16 +86,16 @@ class System {
             return movieStorage.items
         }
 
-        fun returnTicket(ticketId: String): Boolean{
+        fun returnTicket(ticketId: String): Boolean {
             for (session in sessionStorage.items) {
-                val idx = session.tickets.indexOfFirst { it.ID == ticketId }
+                val idx = session.tickets.indexOfFirst { it.id == ticketId }
                 if (idx != -1) {
                     if (session.startTime > LocalDateTime.now()) {
                         session.markPlaceAs(session.tickets[idx].place, SeatStatus.FREE)
                         session.tickets.removeAt(idx)
                         saveData()
                         return true
-                    } else{
+                    } else {
                         return false
                     }
                 }
@@ -101,8 +104,8 @@ class System {
         }
 
         fun editMovie(id: String, newName: String): Boolean {
-            val idx = movieStorage.items.indexOfFirst {it.id == id}
-            val idxName = movieStorage.items.indexOfLast {it.name == newName}
+            val idx = movieStorage.items.indexOfFirst { it.id == id }
+            val idxName = movieStorage.items.indexOfLast { it.name == newName }
             if (idxName != -1) {
                 return false
             }
@@ -112,11 +115,12 @@ class System {
         }
 
         fun markCurrentSessionVisitor(ticketId: String): Boolean {
-            val idx = sessionStorage.items.indexOfFirst { it.startTime <= LocalDateTime.now() && it.endTime >= LocalDateTime.now() }
+            val idx =
+                sessionStorage.items.indexOfFirst { it.startTime <= LocalDateTime.now() && it.endTime >= LocalDateTime.now() }
             if (idx == -1) {
                 return false
             }
-            val ticketIdx = sessionStorage.items[idx].tickets.indexOfFirst { it.ID == ticketId }
+            val ticketIdx = sessionStorage.items[idx].tickets.indexOfFirst { it.id == ticketId }
             if (ticketIdx == -1) {
                 return false
             }
@@ -126,10 +130,10 @@ class System {
         }
 
         fun getFutureSessions(): List<Session> {
-            val isFutureSession: (Session) -> Boolean = {it.startTime > LocalDateTime.now()}
+            val isFutureSession: (Session) -> Boolean = { it.startTime > LocalDateTime.now()  || (it.endTime > LocalDateTime.now() && it.startTime < LocalDateTime.now())}
             val list: MutableList<Session> = mutableListOf()
             for (session in sessionStorage.items) {
-                if (isFutureSession(session)){
+                if (isFutureSession(session)) {
                     list.add(session)
                 }
             }
@@ -138,33 +142,36 @@ class System {
         }
 
         fun getPassedSessions(): List<Session> {
-            val isFutureSession: (Session) -> Boolean = {it.endTime < LocalDateTime.now()}
+            val isFutureSession: (Session) -> Boolean = { it.endTime < LocalDateTime.now() }
             val list: MutableList<Session> = mutableListOf()
             for (session in sessionStorage.items) {
-                if (isFutureSession(session)){
+                if (isFutureSession(session)) {
                     list.add(session)
                 }
             }
             return list
         }
 
-        private fun saveData(): Boolean{
+        private fun saveData(): Boolean {
 
             var result = fileManager.writeToFile(MOVIE_FILE, MovieStorageJSONSerializer().serialize(movieStorage))
-            result = result && fileManager.writeToFile(SESSION_FILE, SessionStorageJSONSerializer().serialize(sessionStorage))
+            result = result && fileManager.writeToFile(
+                SESSION_FILE,
+                SessionStorageJSONSerializer().serialize(sessionStorage)
+            )
             return result
         }
 
         private fun loadData() {
             val unserializedMovies: String = try {
                 fileManager.readFromFile(MOVIE_FILE)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 String()
             }
             movieStorage = movieSerializer.deserialize(unserializedMovies) ?: movieStorage
             val unserializedSessions: String = try {
                 fileManager.readFromFile(SESSION_FILE)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 String()
             }
             sessionStorage = sessionSerializer.deserialize(unserializedSessions) ?: sessionStorage
@@ -175,7 +182,7 @@ class System {
         }
 
         fun removeSession(sessionId: String): Boolean {
-            val idx = sessionStorage.items.indexOfFirst { it.id == sessionId}
+            val idx = sessionStorage.items.indexOfFirst { it.id == sessionId }
             if (idx == -1) {
                 return false
             }

@@ -1,4 +1,3 @@
-
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -7,14 +6,14 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class FileManager {
-    fun writeToFile(path: String, text: String): Boolean{
+    fun writeToFile(path: String, text: String): Boolean {
         val file = File(path)
 
         file.createNewFile()
 
         try {
-            PrintWriter(file, Charsets.UTF_8).use { it.print(text)}
-        } catch (e : IOException) {
+            PrintWriter(file, Charsets.UTF_8).use { it.print(text) }
+        } catch (e: IOException) {
             return false
         }
         return true

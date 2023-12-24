@@ -1,9 +1,13 @@
-
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-class Session(val id: String, val movieId: String, @Serializable(with = JsonLocalDateTimeSerializer::class) var startTime: LocalDateTime, var cost: Int) {
+class Session(
+    val id: String,
+    val movieId: String,
+    @Serializable(with = JsonLocalDateTimeSerializer::class) var startTime: LocalDateTime,
+    var cost: Int,
+) {
     val placesStatus: MutableList<SeatStatus> = mutableListOf()
 
     companion object {
@@ -12,42 +16,44 @@ class Session(val id: String, val movieId: String, @Serializable(with = JsonLoca
     }
 
     init {
-        while (placesStatus.size < TOTAL_SEATS){
+        while (placesStatus.size < TOTAL_SEATS) {
             placesStatus.add(SeatStatus.FREE)
         }
     }
 
 
-
     @kotlinx.serialization.Transient
     var movie: Movie = Movie("-1", String(), -1)
 
-    val endTime: LocalDateTime  get() {return startTime.plusMinutes(movie.duration)}
+    val endTime: LocalDateTime
+        get() {
+            return startTime.plusMinutes(movie.duration)
+        }
 
     val tickets: MutableList<Ticket> = mutableListOf()
 
 
-
     fun placeIsFree(place: Int): Boolean {
-        return place in 0..<Companion.TOTAL_SEATS && placesStatus[place] == SeatStatus.FREE
+        return place in 0..<TOTAL_SEATS && placesStatus[place] == SeatStatus.FREE
     }
 
-    fun markPlaceAs(place: Int, status: SeatStatus): Unit {
-        if (place in 0..<Companion.TOTAL_SEATS) {
+    fun markPlaceAs(place: Int, status: SeatStatus) {
+        if (place in 0..<TOTAL_SEATS) {
             if (placesStatus[place].ordinal == status.ordinal - 1 || (placesStatus[place] == SeatStatus.SOLD && status == SeatStatus.FREE)) {
                 try {
                     placesStatus[place] = status
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     println(e.message)
                 }
 
                 return
             }
         }
+        return
     }
 
     fun isFull(): Boolean {
-        return tickets.size >= Companion.TOTAL_SEATS
+        return tickets.size >= TOTAL_SEATS
     }
 
 }
